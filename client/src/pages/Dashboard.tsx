@@ -4,8 +4,11 @@ import PollutantCard from "@/components/PollutantCard";
 import AQIChart from "@/components/AQIChart";
 import HealthAdvisory from "@/components/HealthAdvisory";
 import NotificationPanel from "@/components/NotificationPanel";
+import AIChatbot from "@/components/AIChatbot";
+import GeoCityComparison from "@/components/GeoCityComparison";
+import IoTDeviceMonitor from "@/components/IoTDeviceMonitor";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Download, AlertTriangle } from "lucide-react";
+import { RefreshCw, Download, AlertTriangle, Bot, MapPin, Wifi } from "lucide-react";
 import { useState } from "react";
 
 export default function Dashboard() {
@@ -142,6 +145,75 @@ export default function Dashboard() {
         <div>
           <NotificationPanel notifications={mockNotifications} />
         </div>
+      </div>
+
+      {/* AI Assistant Section */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <Bot className="h-5 w-5 text-primary" />
+          <h2 className="text-xl font-semibold">AI Assistant</h2>
+          <span className="text-sm text-muted-foreground">Ask questions or use voice commands</span>
+        </div>
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+          <AIChatbot 
+            sessionId={`dashboard-${new Date().getDate()}`}
+            location="Bengaluru Central"
+            className="h-80"
+          />
+          <div className="space-y-4">
+            <div className="bg-muted/30 rounded-lg p-4">
+              <h3 className="font-medium mb-3">Quick Commands</h3>
+              <div className="grid grid-cols-1 gap-2">
+                <Button variant="outline" size="sm" className="justify-start text-left h-auto py-2 px-3">
+                  <span className="text-xs">"What's the current AQI?"</span>
+                </Button>
+                <Button variant="outline" size="sm" className="justify-start text-left h-auto py-2 px-3">
+                  <span className="text-xs">"Is it safe to exercise outside?"</span>
+                </Button>
+                <Button variant="outline" size="sm" className="justify-start text-left h-auto py-2 px-3">
+                  <span className="text-xs">"Will pollution be high tomorrow?"</span>
+                </Button>
+                <Button variant="outline" size="sm" className="justify-start text-left h-auto py-2 px-3">
+                  <span className="text-xs">"Should I wear a mask today?"</span>
+                </Button>
+              </div>
+            </div>
+            
+            <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
+              <h3 className="font-medium mb-2 flex items-center gap-2">
+                <Bot className="h-4 w-4" />
+                Voice Assistant Features
+              </h3>
+              <ul className="text-sm text-muted-foreground space-y-1">
+                <li>• Speech recognition in supported browsers</li>
+                <li>• Natural language understanding for air quality queries</li>
+                <li>• Text-to-speech responses</li>
+                <li>• Context-aware recommendations</li>
+                <li>• Real-time AQI data integration</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Geo-Comparison Section */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <MapPin className="h-5 w-5 text-primary" />
+          <h2 className="text-xl font-semibold">Multi-City Comparison</h2>
+          <span className="text-sm text-muted-foreground">Compare AQI across Indian cities</span>
+        </div>
+        <GeoCityComparison />
+      </div>
+
+      {/* IoT Device Monitoring Section */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <Wifi className="h-5 w-5 text-primary" />
+          <h2 className="text-xl font-semibold">IoT Device Network</h2>
+          <span className="text-sm text-muted-foreground">Real-time sensor monitoring</span>
+        </div>
+        <IoTDeviceMonitor />
       </div>
     </div>
   );
