@@ -12,10 +12,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Helper function to get current AQI context
   async function getCurrentAQIContext(location: string = "Bengaluru Central") {
-    const latestReading = await storage.getLatestAQIReading(location);
-    
-    if (!latestReading) {
-      // Fallback mock data if no readings available
+    try {
+      const latestReading = await storage.getLatestAQIReading(location);
+      
+      if (!latestReading) {
+        // Fallback mock data if no readings available
+        return {
+          currentAQI: 125,
+          location: location,
+          pollutants: {
+            pm25: 35,
+            pm10: 68,
+            co: 1.2,
+            o3: 85,
+            no2: 42,
+            so2: 15
+          },
+          weather: {
+            temperature: 28,
+            humidity: 65,
+            windSpeed: 12
+          },
+          timestamp: new Date().toISOString()
+        };
+      }
+      
+      return {
+        currentAQI: latestReading.aqi,
+        location: latestReading.location,
+        pollutants: {
+          pm25: latestReading.pm25,
+          pm10: latestReading.pm10,
+          co: latestReading.co,
+          o3: latestReading.o3,
+          no2: latestReading.no2,
+          so2: latestReading.so2
+        },
+        weather: {
+          temperature: latestReading.temperature || 28,
+          humidity: latestReading.humidity || 65,
+          windSpeed: latestReading.windSpeed || 12
+        },
+        timestamp: latestReading.timestamp.toISOString()
+      };
+    } catch (error) {
+      console.error('Error getting AQI context:', error);
+      // Return fallback data on error
       return {
         currentAQI: 125,
         location: location,
@@ -35,25 +77,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         timestamp: new Date().toISOString()
       };
     }
-    
-    return {
-      currentAQI: latestReading.aqi,
-      location: latestReading.location,
-      pollutants: {
-        pm25: latestReading.pm25,
-        pm10: latestReading.pm10,
-        co: latestReading.co,
-        o3: latestReading.o3,
-        no2: latestReading.no2,
-        so2: latestReading.so2
-      },
-      weather: {
-        temperature: latestReading.temperature || 28,
-        humidity: latestReading.humidity || 65,
-        windSpeed: latestReading.windSpeed || 12
-      },
-      timestamp: latestReading.timestamp.toISOString()
-    };
   }
 
   // AI Chat endpoint

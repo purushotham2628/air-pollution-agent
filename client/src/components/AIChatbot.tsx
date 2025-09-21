@@ -32,7 +32,7 @@ export default function AIChatbot({ sessionId, location = "Bengaluru Central", c
 
   useEffect(() => {
     // Check for speech recognition support
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    if (typeof window !== 'undefined' && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
       setIsVoiceSupported(true);
       const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       recognitionRef.current = new SpeechRecognition();
@@ -58,7 +58,7 @@ export default function AIChatbot({ sessionId, location = "Bengaluru Central", c
     }
     
     // Check for speech synthesis support
-    if ('speechSynthesis' in window) {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       synthRef.current = window.speechSynthesis;
     }
     
