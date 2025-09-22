@@ -8,18 +8,25 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Add CORS headers for development
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV === "development") {
   app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-    if (req.method === 'OPTIONS') {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header(
+      "Access-Control-Allow-Methods",
+      "GET, POST, PUT, DELETE, OPTIONS"
+    );
+    res.header(
+      "Access-Control-Allow-Headers",
+      "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+    );
+    if (req.method === "OPTIONS") {
       res.sendStatus(200);
     } else {
       next();
     }
   });
 }
+
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
@@ -72,14 +79,18 @@ app.use((req, res, next) => {
 
   // ALWAYS serve the app on the port specified in the environment variable PORT
   // Other ports are firewalled. Default to 5000 if not specified.
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = parseInt(process.env.PORT || '5000', 10);
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`serving on port ${port}`);
-  });
+  const port = parseInt(process.env.PORT || "5000", 10);
+  const host = process.env.HOST || "127.0.0.1"; // default for Windows
+
+  server.listen(
+    {
+      port,
+      host,
+      // reusePort is not supported on Windows
+      ...(process.platform !== "win32" ? { reusePort: true } : {}),
+    },
+    () => {
+      log(`Serving on http://${host}:${port}`);
+    }
+  );
 })();
