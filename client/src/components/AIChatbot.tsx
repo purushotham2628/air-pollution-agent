@@ -223,7 +223,7 @@ export default function AIChatbot({ sessionId, location = "Bengaluru Central", c
   };
 
   return (
-    <Card className={cn("flex flex-col h-96", className)} data-testid="card-ai-chatbot">
+    <Card className={cn("flex flex-col", className)} data-testid="card-ai-chatbot">
       <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
         <div className="flex items-center gap-2">
           <CardTitle className="text-lg font-medium">AirWatch AI Assistant</CardTitle>
@@ -247,8 +247,8 @@ export default function AIChatbot({ sessionId, location = "Bengaluru Central", c
         </div>
       </CardHeader>
       
-      <CardContent className="flex flex-col flex-1 gap-4 p-4">
-        <ScrollArea className="flex-1" ref={scrollAreaRef}>
+      <CardContent className="flex flex-col flex-1 gap-4 p-4 min-h-0">
+        <ScrollArea className="flex-1 min-h-0" ref={scrollAreaRef}>
           <div className="space-y-4 pr-4">
             {messages.map((message, index) => (
               <div
@@ -268,12 +268,12 @@ export default function AIChatbot({ sessionId, location = "Bengaluru Central", c
                 )}
                 
                 <div className={cn(
-                  "max-w-[80%] rounded-lg px-3 py-2",
+                  "max-w-[85%] rounded-lg px-3 py-2 break-words",
                   message.role === 'user' 
                     ? "bg-primary text-primary-foreground" 
                     : "bg-muted"
                 )}>
-                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                  <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
                   <p className="text-xs opacity-70 mt-1">
                     {formatTime(message.timestamp)}
                   </p>

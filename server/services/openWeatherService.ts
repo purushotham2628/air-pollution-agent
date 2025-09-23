@@ -67,7 +67,11 @@ export class OpenWeatherService {
   constructor() {
     // For demo purposes, we'll use mock data if no API key is provided
     // In production, users should provide their own OpenWeather API key
-    this.apiKey = process.env.OPENWEATHER_API_KEY || 'demo';
+    this.apiKey = process.env.OPENWEATHER_API_KEY || '';
+    
+    if (!this.apiKey) {
+      console.warn('OpenWeather API key not found. Using mock data. Please set OPENWEATHER_API_KEY in your .env file.');
+    }
   }
 
   async getAQIData(cityName: string): Promise<any> {
@@ -76,7 +80,7 @@ export class OpenWeatherService {
       throw new Error(`City '${cityName}' not found in supported cities`);
     }
 
-    if (this.apiKey === 'demo') {
+    if (!this.apiKey || this.apiKey === 'demo') {
       // Return mock data for demo purposes
       return this.getMockAQIData(city);
     }
@@ -104,7 +108,7 @@ export class OpenWeatherService {
       throw new Error(`City '${cityName}' not found`);
     }
 
-    if (this.apiKey === 'demo') {
+    if (!this.apiKey || this.apiKey === 'demo') {
       return this.getMockWeatherData(city);
     }
 

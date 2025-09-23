@@ -7,18 +7,23 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import ThemeToggle from "@/components/ThemeToggle";
 import Dashboard from "@/pages/Dashboard";
+import AirQuality from "@/pages/AirQuality";
+import HealthAdvisory from "@/pages/HealthAdvisory";
+import Notifications from "@/pages/Notifications";
+import ExportData from "@/pages/ExportData";
+import Settings from "@/pages/Settings";
 import NotFound from "@/pages/not-found";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Dashboard} />
-      <Route path="/air-quality" component={() => <div className="p-6"><h1 className="text-2xl font-bold">Air Quality (Coming Soon)</h1></div>} />
-      <Route path="/health" component={() => <div className="p-6"><h1 className="text-2xl font-bold">Health Advisory (Coming Soon)</h1></div>} />
-      <Route path="/notifications" component={() => <div className="p-6"><h1 className="text-2xl font-bold">Notifications (Coming Soon)</h1></div>} />
+      <Route path="/air-quality" component={AirQuality} />
+      <Route path="/health" component={HealthAdvisory} />
+      <Route path="/notifications" component={Notifications} />
       <Route path="/map" component={() => <div className="p-6"><h1 className="text-2xl font-bold">Map View (Coming Soon)</h1></div>} />
-      <Route path="/export" component={() => <div className="p-6"><h1 className="text-2xl font-bold">Export Data (Coming Soon)</h1></div>} />
-      <Route path="/settings" component={() => <div className="p-6"><h1 className="text-2xl font-bold">Settings (Coming Soon)</h1></div>} />
+      <Route path="/export" component={ExportData} />
+      <Route path="/settings" component={Settings} />
       <Route component={NotFound} />
     </Switch>
   );
