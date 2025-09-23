@@ -3,17 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { 
-  Shield, 
-  AlertTriangle, 
-  Heart, 
-  Leaf, 
-  Users, 
-  RefreshCw,
-  Baby,
-  Activity,
-  Mask
-} from "lucide-react";
+import { Shield, AlertTriangle, Heart, Leaf, Users, RefreshCw, Baby, Activity, VenetianMask as Mask } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface AQIData {
