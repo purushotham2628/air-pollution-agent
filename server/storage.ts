@@ -57,6 +57,38 @@ export class MemStorage implements IStorage {
   }
 
   private initializeMockData() {
+    // Create multiple mock readings for different locations and times
+    const locations = ['Bengaluru Central', 'Whitefield', 'Electronic City', 'Koramangala'];
+    const now = new Date();
+    
+    locations.forEach((location, locationIndex) => {
+      // Create readings for the last 24 hours
+      for (let i = 0; i < 24; i++) {
+        const timestamp = new Date(now.getTime() - (i * 60 * 60 * 1000)); // Every hour
+        const baseAQI = 100 + locationIndex * 20 + Math.floor(Math.random() * 50);
+        const baseTemp = 26 + locationIndex * 2 + Math.floor(Math.random() * 6);
+        
+        const mockReading: AQIReading = {
+          id: randomUUID(),
+          location: location,
+          aqi: baseAQI,
+          pm25: Math.round(baseAQI * 0.3 + Math.random() * 10),
+          pm10: Math.round(baseAQI * 0.5 + Math.random() * 15),
+          co: Math.round((baseAQI * 0.01 + Math.random() * 0.5) * 100) / 100,
+          o3: Math.round(baseAQI * 0.8 + Math.random() * 20),
+          no2: Math.round(baseAQI * 0.4 + Math.random() * 10),
+          so2: Math.round(baseAQI * 0.15 + Math.random() * 5),
+          temperature: baseTemp,
+          humidity: 60 + Math.floor(Math.random() * 30),
+          windSpeed: 8 + Math.floor(Math.random() * 10),
+          timestamp: timestamp,
+          source: "mock"
+        };
+        this.aqiReadings.set(mockReading.id, mockReading);
+      }
+    });
+    
+    // Keep the original single reading for immediate display
     const mockAQIReading: AQIReading = {
       id: randomUUID(),
       location: "Bengaluru Central",
@@ -73,7 +105,7 @@ export class MemStorage implements IStorage {
       timestamp: new Date(),
       source: "openweather"
     };
-    this.aqiReadings.set(mockAQIReading.id, mockAQIReading);
+    this.aqiReadings.set(`current-${mockAQIReading.id}`, mockAQIReading);
   }
 
   // User methods

@@ -11,7 +11,10 @@ import { Button } from "@/components/ui/button";
 import { RefreshCw, Download, AlertTriangle, Bot, MapPin, Wifi } from "lucide-react";
 import { useState } from "react";
 
+import { useLocation } from "wouter";
+
 export default function Dashboard() {
+  const [, setLocation] = useLocation();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   //todo: remove mock functionality
@@ -58,8 +61,7 @@ export default function Dashboard() {
   };
 
   const handleExportData = () => {
-    console.log('Exporting dashboard data...'); //todo: remove mock functionality
-    // Mock export functionality
+    setLocation('/export');
   };
 
   return (

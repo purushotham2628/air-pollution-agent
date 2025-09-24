@@ -90,22 +90,36 @@ export default function ExportData() {
     setIsExporting(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const response = await fetch('/api/export', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          format: exportOptions.format,
+          dateRange: exportOptions.dateRange,
+          dataTypes: exportOptions.dataTypes,
+          locations: exportOptions.locations,
+          includeMetadata: exportOptions.includeMetadata
+        }),
+      });
       
-      // Create export data based on selected options
-      const exportData = await generateExportData();
+      if (!response.ok) {
+        throw new Error('Export failed');
+      }
+      
+      const result = await response.json();
       
       // Download the file
-      downloadFile(exportData, exportOptions.format);
+      downloadFile(result.data, exportOptions.format);
       
       // Add to export history
       const newExport = {
         id: Date.now().toString(),
         filename: `airquality_export_${format(new Date(), 'yyyy_MM_dd')}.${exportOptions.format}`,
         format: exportOptions.format.toUpperCase(),
-        size: '1.2 MB',
-        records: 500,
+        size: `${(JSON.stringify(result.data).length / 1024 / 1024).toFixed(1)} MB`,
+        records: result.totalRecords,
         timestamp: new Date().toISOString(),
         status: 'completed'
       };
@@ -114,49 +128,20 @@ export default function ExportData() {
       
     } catch (error) {
       console.error('Export failed:', error);
+      // Add error to export history
+      const errorExport = {
+        id: Date.now().toString(),
+        filename: `failed_export_${format(new Date(), 'yyyy_MM_dd')}.${exportOptions.format}`,
+        format: exportOptions.format.toUpperCase(),
+        size: '0 MB',
+        records: 0,
+        timestamp: new Date().toISOString(),
+        status: 'failed'
+      };
+      setExportHistory(prev => [errorExport, ...prev]);
     } finally {
       setIsExporting(false);
     }
-  };
-
-  const generateExportData = async () => {
-    // Mock data generation based on selected options
-    const data = [];
-    const startDate = exportOptions.dateRange.from || new Date();
-    const endDate = exportOptions.dateRange.to || new Date();
-    
-    // Generate sample data points
-    for (let i = 0; i < 100; i++) {
-      const timestamp = new Date(startDate.getTime() + (i * (endDate.getTime() - startDate.getTime()) / 100));
-      
-      const record: any = {
-        timestamp: timestamp.toISOString(),
-        location: exportOptions.locations[0] || 'Bengaluru Central'
-      };
-      
-      if (exportOptions.dataTypes.aqi) {
-        record.aqi = 80 + Math.floor(Math.random() * 100);
-      }
-      
-      if (exportOptions.dataTypes.pollutants) {
-        record.pm25 = 25 + Math.random() * 50;
-        record.pm10 = 45 + Math.random() * 70;
-        record.co = 1 + Math.random() * 2;
-        record.o3 = 60 + Math.random() * 80;
-        record.no2 = 30 + Math.random() * 40;
-        record.so2 = 10 + Math.random() * 20;
-      }
-      
-      if (exportOptions.dataTypes.weather) {
-        record.temperature = 25 + Math.random() * 10;
-        record.humidity = 50 + Math.random() * 40;
-        record.windSpeed = 5 + Math.random() * 15;
-      }
-      
-      data.push(record);
-    }
-    
-    return data;
   };
 
   const downloadFile = (data: any[], format: string) => {
@@ -215,7 +200,8 @@ export default function ExportData() {
   };
 
   const selectedDataTypes = Object.values(exportOptions.dataTypes).filter(Boolean).length;
-  const estimatedRecords = selectedDataTypes * 100; // Mock calculation
+  const estimatedRecords = selectedDataTypes * 150; // More realistic calculation
+  const estimatedSize = `${(estimatedRecords * 0.02).toFixed(1)}MB`;
 
   return (
     <div className="space-y-6">
@@ -372,13 +358,17 @@ export default function ExportData() {
 
               {/* Format and Options */}
               <div className="grid grid-cols-2 gap-4">
+                <p className="text-xs">Your export history will appear here</p>
                 <div className="space-y-2">
                   <Label htmlFor="export-format">Export Format</Label>
                   <Select
                     value={exportOptions.format}
                     onValueChange={(value: 'csv' | 'json' | 'xlsx') => 
                       setExportOptions(prev => ({ ...prev, format: value }))
-                    }
+                    className={cn(
+                      "p-3 rounded-lg border hover-elevate",
+                      export_item.status === 'failed' ? "border-destructive/20 bg-destructive/5" : ""
+                    )}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -424,7 +414,7 @@ export default function ExportData() {
                   <div className="text-sm text-muted-foreground">Data Types</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-primary">~2.1MB</div>
+                  <div className="text-2xl font-bold text-primary">{estimatedSize}</div>
                   <div className="text-sm text-muted-foreground">Estimated Size</div>
                 </div>
               </div>
@@ -499,7 +489,9 @@ export default function ExportData() {
                     </div>
                   ))}
                 </div>
-              )}
+                        ) : export_item.status === 'failed' ? (
+                          <AlertCircle className="h-4 w-4 text-chart-4" />
+                        ) : (
             </CardContent>
           </Card>
 

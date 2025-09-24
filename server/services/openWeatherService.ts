@@ -206,6 +206,12 @@ export class OpenWeatherService {
     const variation = Math.floor(Math.random() * 40) - 20; // ±20 variation
     const aqi = Math.max(50, baseAQI + variation);
     
+    // Generate realistic temperature for Indian cities
+    const baseTemp = city.name === 'Mumbai' ? 29 : 
+                    city.name === 'Delhi' ? 25 : 
+                    city.name === 'Bengaluru' ? 28 : 27;
+    const temperature = baseTemp + Math.floor(Math.random() * 6) - 3;
+    
     return {
       location: city.name,
       state: city.state,
@@ -216,6 +222,9 @@ export class OpenWeatherService {
       o3: Math.round(aqi * 0.8 + Math.random() * 20),
       no2: Math.round(aqi * 0.4 + Math.random() * 10),
       so2: Math.round(aqi * 0.15 + Math.random() * 5),
+      temperature: temperature,
+      humidity: 60 + Math.floor(Math.random() * 30),
+      windSpeed: 8 + Math.floor(Math.random() * 10),
       timestamp: new Date(),
       source: 'mock'
     };

@@ -81,6 +81,9 @@ export default function GeoCityComparison({ className }: GeoCityComparisonProps)
         o3: 85 + Math.floor(Math.random() * 30),
         no2: 42 + Math.floor(Math.random() * 20),
         so2: 15 + Math.floor(Math.random() * 10),
+        temperature: 25 + Math.floor(Math.random() * 8),
+        humidity: 55 + Math.floor(Math.random() * 30),
+        windSpeed: 8 + Math.floor(Math.random() * 12),
         timestamp: new Date(),
         source: 'mock'
       }));

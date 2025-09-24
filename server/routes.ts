@@ -49,9 +49,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           so2: latestReading.so2
         },
         weather: {
-          temperature: latestReading.temperature || 28,
-          humidity: latestReading.humidity || 65,
-          windSpeed: latestReading.windSpeed || 12
+          temperature: latestReading.temperature ?? 28,
+          humidity: latestReading.humidity ?? 65,
+          windSpeed: latestReading.windSpeed ?? 12
         },
         timestamp: latestReading.timestamp.toISOString()
       };
@@ -250,9 +250,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             o3: data.o3,
             no2: data.no2,
             so2: data.so2,
-            temperature: null,
-            humidity: null,
-            windSpeed: null,
+            temperature: data.temperature ?? null,
+            humidity: data.humidity ?? null,
+            windSpeed: data.windSpeed ?? null,
             source: data.source
           });
         } catch (storageError) {
@@ -293,6 +293,116 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Supported Cities API Error:', error);
       res.status(500).json({ error: 'Failed to retrieve supported cities' });
+    }
+  });
+
+  // Export data endpoint
+  app.post('/api/export', async (req, res) => {
+    try {
+      const { 
+        format, 
+        dateRange, 
+        dataTypes, 
+        locations, 
+        includeMetadata 
+      } = req.body;
+      
+      if (!format || !dateRange || !dataTypes) {
+        return res.status(400).json({ error: 'Missing required export parameters' });
+      }
+      
+      const exportData = [];
+      const startDate = new Date(dateRange.from);
+      const endDate = new Date(dateRange.to);
+      
+      // Generate export data based on selected options
+      for (const location of locations || ['Bengaluru Central']) {
+        if (dataTypes.aqi || dataTypes.pollutants || dataTypes.weather) {
+          const readings = await storage.getAQIReadingsByTimeRange(location, startDate, endDate);
+          
+          for (const reading of readings) {
+            const record: any = {
+              timestamp: reading.timestamp.toISOString(),
+              location: reading.location
+            };
+            
+            if (dataTypes.aqi) {
+              record.aqi = reading.aqi;
+            }
+            
+            if (dataTypes.pollutants) {
+              record.pm25 = reading.pm25;
+              record.pm10 = reading.pm10;
+              record.co = reading.co;
+              record.o3 = reading.o3;
+              record.no2 = reading.no2;
+              record.so2 = reading.so2;
+            }
+            
+            if (dataTypes.weather) {
+              record.temperature = reading.temperature;
+              record.humidity = reading.humidity;
+              record.windSpeed = reading.windSpeed;
+            }
+            
+            if (includeMetadata) {
+              record.source = reading.source;
+              record.id = reading.id;
+            }
+            
+            exportData.push(record);
+          }
+        }
+      }
+      
+      // If no real data, generate sample data for demo
+      if (exportData.length === 0) {
+        for (let i = 0; i < 100; i++) {
+          const timestamp = new Date(startDate.getTime() + (i * (endDate.getTime() - startDate.getTime()) / 100));
+          const location = locations?.[0] || 'Bengaluru Central';
+          
+          const record: any = {
+            timestamp: timestamp.toISOString(),
+            location: location
+          };
+          
+          if (dataTypes.aqi) {
+            record.aqi = 80 + Math.floor(Math.random() * 100);
+          }
+          
+          if (dataTypes.pollutants) {
+            record.pm25 = Math.round((25 + Math.random() * 50) * 100) / 100;
+            record.pm10 = Math.round((45 + Math.random() * 70) * 100) / 100;
+            record.co = Math.round((1 + Math.random() * 2) * 100) / 100;
+            record.o3 = Math.round(60 + Math.random() * 80);
+            record.no2 = Math.round(30 + Math.random() * 40);
+            record.so2 = Math.round(10 + Math.random() * 20);
+          }
+          
+          if (dataTypes.weather) {
+            record.temperature = Math.round((25 + Math.random() * 10) * 10) / 10;
+            record.humidity = Math.round(50 + Math.random() * 40);
+            record.windSpeed = Math.round((5 + Math.random() * 15) * 10) / 10;
+          }
+          
+          if (includeMetadata) {
+            record.source = 'demo';
+            record.id = `demo-${i}`;
+          }
+          
+          exportData.push(record);
+        }
+      }
+      
+      res.json({ 
+        data: exportData,
+        totalRecords: exportData.length,
+        format: format,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Export API Error:', error);
+      res.status(500).json({ error: 'Failed to export data' });
     }
   });
 

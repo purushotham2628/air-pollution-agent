@@ -20,15 +20,18 @@ export default function AQIChart({ data, title = "AQI Trends", showPrediction = 
   const [timeRange, setTimeRange] = useState<'24h' | '7d' | '30d'>('24h');
 
   const handleExport = () => {
-    console.log('Exporting AQI data...'); //todo: remove mock functionality
-    // Mock export functionality
-    const dataStr = JSON.stringify(data, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `aqi-data-${timeRange}.json`;
-    link.click();
+    try {
+      const dataStr = JSON.stringify(data, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `aqi-chart-data-${timeRange}-${new Date().toISOString().split('T')[0]}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Failed to export chart data:', error);
+    }
   };
 
   return (
